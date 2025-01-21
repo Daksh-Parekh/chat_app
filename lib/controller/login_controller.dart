@@ -1,5 +1,6 @@
 import 'package:chat_app/services/firebase_auth_service.dart';
 import 'package:chat_app/utils/routes/app_routes.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:toastification/toastification.dart';
@@ -11,6 +12,27 @@ class LoginController extends GetxController {
     String msg = await FirebaseAuthService.auth
         .loginUser(email: email, password: password);
     if (msg == "Success") {
+      Get.offNamed(AppRoutes.home);
+      toastification.show(
+        title: Text("Success"),
+        description: Text("Login successfull"),
+        autoCloseDuration: Duration(seconds: 3),
+        type: ToastificationType.success,
+      );
+    } else {
+      toastification.show(
+        title: Text("Failed"),
+        description: Text("Login unsuccessfull"),
+        autoCloseDuration: Duration(seconds: 3),
+        type: ToastificationType.error,
+      );
+    }
+  }
+
+  //Anonymously Login
+  Future<void> anonymouslyLogin() async {
+    User? user = await FirebaseAuthService.auth.anonymouslyLogin();
+    if (user != null) {
       Get.offNamed(AppRoutes.home);
       toastification.show(
         title: Text("Success"),

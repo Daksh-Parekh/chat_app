@@ -68,7 +68,9 @@ class _LoginPageState extends State<LoginPage> {
               Row(
                 children: [
                   ElevatedButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      controller.anonymouslyLogin();
+                    },
                     label: Text("Anonymously"),
                     icon: Icon(Icons.person),
                   ),

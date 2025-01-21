@@ -52,4 +52,10 @@ class FirebaseAuthService {
     }
     return msg;
   }
+
+  //Anonymously Login
+  Future<User?> anonymouslyLogin() async {
+    UserCredential userCredential = await authentication.signInAnonymously();
+    return userCredential.user;
+  }
 }
