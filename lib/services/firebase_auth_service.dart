@@ -80,4 +80,10 @@ class FirebaseAuthService {
 
   //Check user Login
   User? get checkUserStatus => authentication.currentUser;
+
+  //Logout
+  Future<void> logoutUser() async {
+    await authentication.signOut();
+    await googleSignIn.signOut();
+  }
 }

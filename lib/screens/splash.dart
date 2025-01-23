@@ -18,7 +18,7 @@ class SplashScreen extends StatelessWidget {
           : Get.offNamed(AppRoutes.login),
     );
     return Scaffold(
-      body: FlutterLogo(),
+      body: Center(child: FlutterLogo()),
     );
   }
 }
