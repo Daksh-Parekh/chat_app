@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chat_app/controller/login_controller.dart';
 import 'package:chat_app/utils/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,9 +12,7 @@ class SplashScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     Timer(
       Duration(seconds: 3),
-      () {
-        Get.offNamed(AppRoutes.login);
-      },
+      () => Get.offNamed(AppRoutes.login),
     );
     return Scaffold(
       body: FlutterLogo(),

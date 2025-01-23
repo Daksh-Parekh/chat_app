@@ -66,6 +66,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               SizedBox(height: 10.h),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   ElevatedButton.icon(
                     onPressed: () {
@@ -73,6 +74,13 @@ class _LoginPageState extends State<LoginPage> {
                     },
                     label: Text("Anonymously"),
                     icon: Icon(Icons.person),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      controller.googleLogin();
+                    },
+                    label: Text("Google"),
+                    icon: Icon(Icons.g_mobiledata),
                   ),
                 ],
               ),

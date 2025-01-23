@@ -1,11 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class FirebaseAuthService {
   FirebaseAuthService._();
   static FirebaseAuthService auth = FirebaseAuthService._();
 
   var authentication = FirebaseAuth.instance;
+  GoogleSignIn googleSignIn = GoogleSignIn();
 
   //creating user
   Future<String?> creatUser(
@@ -57,5 +59,22 @@ class FirebaseAuthService {
   Future<User?> anonymouslyLogin() async {
     UserCredential userCredential = await authentication.signInAnonymously();
     return userCredential.user;
+  }
+
+  //Google Login
+  Future<User?> googleLogin() async {
+    GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
+
+    OAuthCredential credential = GoogleAuthProvider.credential(
+      idToken: googleAuth.idToken,
+      accessToken: googleAuth.accessToken,
+    );
+
+    UserCredential userCred =
+        await authentication.signInWithCredential(credential);
+
+    return userCred.user;
   }
 }
