@@ -77,4 +77,7 @@ class FirebaseAuthService {
 
     return userCred.user;
   }
+
+  //Check user Login
+  User? get checkUserStatus => authentication.currentUser;
 }
