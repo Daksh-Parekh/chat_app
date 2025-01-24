@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:developer';
 
+import 'package:chat_app/modal/user_modal.dart';
 import 'package:chat_app/services/firebase_auth_service.dart';
+import 'package:chat_app/services/firebase_firestore_service.dart';
 import 'package:chat_app/utils/routes/app_routes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -57,6 +60,21 @@ class LoginController extends GetxController {
     User? user = await FirebaseAuthService.auth.googleLogin();
     if (user != null) {
       Get.offNamed(AppRoutes.home);
+      var userStatus = FirebaseAuthService.auth.checkUserStatus;
+      UserModal m = UserModal(
+          uid: user.uid,
+          name: user.displayName,
+          email: user.email,
+          password: "",
+          image: user.photoURL);
+      print("${user}");
+
+      if (userStatus != null) {
+        log("${user}");
+        FirestoreService.fireStoreService.addUser(
+          modal: user,
+        );
+      }
       toastification.show(
         title: Text("Success"),
         description: Text("Login successfull"),
