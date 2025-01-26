@@ -6,7 +6,7 @@ class FirebaseAuthService {
   FirebaseAuthService._();
   static FirebaseAuthService auth = FirebaseAuthService._();
 
-  var authentication = FirebaseAuth.instance;
+  FirebaseAuth authentication = FirebaseAuth.instance;
   GoogleSignIn googleSignIn = GoogleSignIn();
 
   //creating user
@@ -24,7 +24,7 @@ class FirebaseAuthService {
       switch (e.code) {
         case 'operation-not-allowed':
           msg = 'this service not available';
-        case 'weak-password':
+        case 'week-password':
           msg = "Your password is too week";
         default:
           msg = e.code;
@@ -62,20 +62,31 @@ class FirebaseAuthService {
   }
 
   //Google Login
-  Future<User?> googleLogin() async {
-    GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+  Future<String> googleLogin() async {
+    String msg;
 
-    GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
+    try {
+      GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
-    OAuthCredential credential = GoogleAuthProvider.credential(
-      idToken: googleAuth.idToken,
-      accessToken: googleAuth.accessToken,
-    );
+      if (googleUser != null) {
+        GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
-    UserCredential userCred =
+        OAuthCredential credential = GoogleAuthProvider.credential(
+          idToken: googleAuth.idToken,
+          accessToken: googleAuth.accessToken,
+        );
+
         await authentication.signInWithCredential(credential);
 
-    return userCred.user;
+        msg = "Success";
+      } else {
+        msg = "No google Account";
+      }
+    } on FirebaseAuthException catch (e) {
+      msg = e.code;
+    }
+
+    return msg;
   }
 
   //Check user Login

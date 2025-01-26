@@ -57,22 +57,22 @@ class LoginController extends GetxController {
 
   //Google login
   Future<void> googleLogin() async {
-    User? user = await FirebaseAuthService.auth.googleLogin();
-    if (user != null) {
+    String? user = await FirebaseAuthService.auth.googleLogin();
+    if (user == "Success") {
       Get.offNamed(AppRoutes.home);
       var userStatus = FirebaseAuthService.auth.checkUserStatus;
-      UserModal m = UserModal(
-          uid: user.uid,
-          name: user.displayName,
-          email: user.email,
-          password: "",
-          image: user.photoURL);
-      print("${user}");
+      log("$userStatus");
 
       if (userStatus != null) {
         log("${user}");
-        FirestoreService.fireStoreService.addUser(
-          modal: user,
+        await FirestoreService.fireStoreService.addUser(
+          modal: UserModal(
+            uid: userStatus.uid,
+            name: userStatus.displayName,
+            email: userStatus.email,
+            password: "",
+            image: userStatus.photoURL,
+          ),
         );
       }
       toastification.show(

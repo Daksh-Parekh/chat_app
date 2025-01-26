@@ -1,5 +1,8 @@
 import 'package:chat_app/controller/home_controller.dart';
+import 'package:chat_app/modal/user_modal.dart';
 import 'package:chat_app/services/firebase_auth_service.dart';
+import 'package:chat_app/services/firebase_firestore_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -44,6 +47,42 @@ class _HomePageState extends State<HomePage> {
       ),
       appBar: AppBar(
         title: Text("Home Page"),
+      ),
+      body: StreamBuilder(
+        stream: FirestoreService.fireStoreService.fetchUsers(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (snapshot.hasData) {
+            var data = snapshot.data;
+
+            List<QueryDocumentSnapshot<Map<String, dynamic>>>? allDocs =
+                data?.docs ?? [];
+            List<UserModal> userData = allDocs
+                .map(
+                  (e) => UserModal.fromMap(e.data()),
+                )
+                .toList();
+            return ListView.builder(
+              itemCount: userData.length,
+              itemBuilder: (context, index) {
+                var usersInfo = userData[index];
+
+                return ListTile(
+                  leading: CircleAvatar(
+                    foregroundImage: NetworkImage(usersInfo.image!),
+                  ),
+                  title: Text("${usersInfo.name}"),
+                );
+              },
+            );
+          }
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        },
       ),
     );
   }

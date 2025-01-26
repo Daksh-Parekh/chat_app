@@ -2,7 +2,7 @@ class UserModal {
   String? uid, name, email, password, image;
 
   UserModal(
-      {required String uid,
+      {required this.uid,
       required this.name,
       required this.email,
       required this.password,

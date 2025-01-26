@@ -10,15 +10,15 @@ class FirestoreService {
   String collectionName = "Users";
 
   //Add Users
-  void addUser({required User modal}) {
-    UserModal userModal = UserModal(
-      uid: modal.uid,
-      name: modal.displayName,
-      email: modal.email,
-      image: modal.photoURL,
-      password: "",
-    );
+  Future<void> addUser({required UserModal modal}) async {
+    await firestore
+        .collection(collectionName)
+        .doc(modal.email)
+        .set(modal.toMap);
+  }
 
-    firestore.collection(collectionName).doc(modal.email).set(userModal.toMap);
+  //FetchUsers
+  Stream<QuerySnapshot<Map<String, dynamic>>> fetchUsers() {
+    return firestore.collection(collectionName).snapshots();
   }
 }
