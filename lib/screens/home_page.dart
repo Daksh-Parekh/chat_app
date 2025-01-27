@@ -2,6 +2,7 @@ import 'package:chat_app/controller/home_controller.dart';
 import 'package:chat_app/modal/user_modal.dart';
 import 'package:chat_app/services/firebase_auth_service.dart';
 import 'package:chat_app/services/firebase_firestore_service.dart';
+import 'package:chat_app/utils/routes/app_routes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -81,6 +82,9 @@ class _HomePageState extends State<HomePage> {
                 var usersInfo = userData[index];
 
                 return ListTile(
+                  onTap: () {
+                    Get.toNamed(AppRoutes.chat, arguments: usersInfo);
+                  },
                   leading: CircleAvatar(
                     foregroundImage: NetworkImage(usersInfo.image ?? ''),
                   ),

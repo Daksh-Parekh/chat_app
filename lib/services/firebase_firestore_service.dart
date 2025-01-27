@@ -1,3 +1,4 @@
+import 'package:chat_app/modal/chat_modal.dart';
 import 'package:chat_app/modal/user_modal.dart';
 import 'package:chat_app/services/firebase_auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,6 +10,7 @@ class FirestoreService {
 
   var firestore = FirebaseFirestore.instance;
   String collectionName = "Users";
+  String chatRoomCollectionName = "Chatroom";
 
   //Add Users
   Future<void> addUser({required UserModal modal}) async {
@@ -33,5 +35,20 @@ class FirestoreService {
   Future<DocumentSnapshot<Map<String, dynamic>>> fetchSingleUser() async {
     String email = FirebaseAuthService.auth.checkUserStatus!.email ?? '';
     return await firestore.collection(collectionName).doc(email).get();
+  }
+
+  //Chat Logic
+  void sentChat({required ChatModal modal}) {
+    List user = [modal.sender, modal.receiver];
+
+    user.sort();
+
+    String docId = user.join('_');
+
+    firestore
+        .collection(chatRoomCollectionName)
+        .doc(docId)
+        .collection('Chats')
+        .add(modal.toMap);
   }
 }
