@@ -1,5 +1,6 @@
 import 'package:chat_app/controller/register_controller.dart';
 import 'package:chat_app/modal/user_modal.dart';
+import 'package:chat_app/services/api_service.dart';
 import 'package:chat_app/utils/extension/email_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -103,14 +104,17 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     SizedBox(height: 10.h),
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         if (registerFormKey.currentState!.validate() &&
                             controller.image != null) {
                           if (passController.text == cPassController.text) {
+                            String img = await APIService.apiService
+                                .uploadUserImg(image: controller.image!);
+
                             controller.register(
                               email: emailController.text.trim(),
                               password: passController.text.trim(),
-                              image: controller.image!.path,
+                              image: img,
                               userName: userNameController.text.trim(),
                             );
                           } else {

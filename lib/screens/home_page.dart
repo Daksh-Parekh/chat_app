@@ -65,6 +65,7 @@ class _HomePageState extends State<HomePage> {
                   (e) => UserModal.fromMap(e.data()),
                 )
                 .toList();
+
             return ListView.builder(
               itemCount: userData.length,
               itemBuilder: (context, index) {
