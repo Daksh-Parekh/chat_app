@@ -15,12 +15,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   HomeController controller = Get.put(HomeController());
-  @override
-  void initState() {
-    controller.getCurrentUserData();
-    // TODO: implement initState
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,12 +22,27 @@ class _HomePageState extends State<HomePage> {
       drawer: Drawer(
         child: Column(
           children: [
-            UserAccountsDrawerHeader(
-              currentAccountPicture: CircleAvatar(
-                foregroundImage: NetworkImage(controller.image.value),
-              ),
-              accountName: Text(controller.name.value),
-              accountEmail: Text(controller.email.value),
+            FutureBuilder(
+              future: FirestoreService.fireStoreService.fetchSingleUser(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Text("ERROR : ${snapshot.error}");
+                } else if (snapshot.hasData) {
+                  var data = snapshot.data;
+
+                  UserModal modal = UserModal.fromMap(data?.data() ?? {});
+
+                  return UserAccountsDrawerHeader(
+                    currentAccountPicture: CircleAvatar(
+                      foregroundImage: NetworkImage(modal.image!),
+                    ),
+                    accountName: Text(modal.name!),
+                    accountEmail: Text(modal.email!),
+                  );
+                }
+
+                return Container();
+              },
             ),
             ListTile(
               onTap: () {
@@ -73,7 +82,7 @@ class _HomePageState extends State<HomePage> {
 
                 return ListTile(
                   leading: CircleAvatar(
-                    foregroundImage: NetworkImage(usersInfo.image!),
+                    foregroundImage: NetworkImage(usersInfo.image ?? ''),
                   ),
                   title: Text("${usersInfo.name}"),
                 );
