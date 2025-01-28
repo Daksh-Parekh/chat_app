@@ -37,18 +37,36 @@ class FirestoreService {
     return await firestore.collection(collectionName).doc(email).get();
   }
 
+  String getDocId({required String senderMail, required String receiverMail}) {
+    List user = [senderMail, receiverMail];
+    user.sort();
+    String docId = user.join('_');
+    return docId;
+  }
+
   //Chat Logic
   void sentChat({required ChatModal modal}) {
-    List user = [modal.sender, modal.receiver];
-
-    user.sort();
-
-    String docId = user.join('_');
-
+    String docId =
+        getDocId(senderMail: modal.sender, receiverMail: modal.receiver);
     firestore
         .collection(chatRoomCollectionName)
         .doc(docId)
         .collection('Chats')
         .add(modal.toMap);
+  }
+
+  //fetch chats
+  Stream<QuerySnapshot<Map<String, dynamic>>> fetchChats(
+      {required String senderMail, required String receiverMail}) {
+    String docId = getDocId(
+      senderMail: senderMail,
+      receiverMail: receiverMail,
+    );
+    return firestore
+        .collection(chatRoomCollectionName)
+        .doc(docId)
+        .collection('Chats')
+        .orderBy('time', descending: false)
+        .snapshots();
   }
 }

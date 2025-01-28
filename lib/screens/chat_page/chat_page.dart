@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:chat_app/modal/chat_modal.dart';
 import 'package:chat_app/modal/user_modal.dart';
 import 'package:chat_app/services/firebase_auth_service.dart';
@@ -61,6 +63,66 @@ class _ChatPageState extends State<ChatPage> {
                 ),
                 Spacer(),
               ],
+            ),
+            Expanded(
+              child: StreamBuilder(
+                stream: FirestoreService.fireStoreService.fetchChats(
+                    senderMail:
+                        FirebaseAuthService.auth.checkUserStatus!.email ?? '',
+                    receiverMail: user.email!),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    var data = snapshot.data;
+
+                    List<QueryDocumentSnapshot<Map<String, dynamic>>> allChats =
+                        data!.docs;
+
+                    List<ChatModal> allChatData = allChats
+                        .map(
+                          (e) => ChatModal.fromMap(data: e.data()),
+                        )
+                        .toList();
+
+                    // log("${allChatData}");
+                    return ListView.builder(
+                      itemCount: allChatData.length,
+                      itemBuilder: (context, index) {
+                        // log("${allChatData[index].time}");
+                        return (allChatData[index].receiver == user.email)
+                            ? Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.amber,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    padding: EdgeInsets.all(8),
+                                    margin: EdgeInsets.all(4),
+                                    child: Text("${allChatData[index].msg}"),
+                                  ),
+                                ],
+                              )
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.amber,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    padding: EdgeInsets.all(8),
+                                    margin: EdgeInsets.all(4),
+                                    child: Text("${allChatData[index].msg}"),
+                                  ),
+                                ],
+                              );
+                      },
+                    );
+                  }
+                  return Container();
+                },
+              ),
             ),
             Spacer(),
             Stack(
