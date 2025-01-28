@@ -21,6 +21,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     UserModal user = Get.arguments;
     TextEditingController msgController = TextEditingController();
+    TextEditingController editMsgController = TextEditingController();
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(14.0),
@@ -87,20 +88,107 @@ class _ChatPageState extends State<ChatPage> {
                     return ListView.builder(
                       itemCount: allChatData.length,
                       itemBuilder: (context, index) {
+                        DateTime time = allChatData[index].time.toDate();
                         // log("${allChatData[index].time}");
                         return (allChatData[index].receiver == user.email)
                             ? Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.amber,
-                                      borderRadius: BorderRadius.circular(10),
+                                  GestureDetector(
+                                    onLongPress: () {
+                                      Get.defaultDialog(
+                                        content: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            IconButton(
+                                              onPressed: () {
+                                                FirestoreService
+                                                    .fireStoreService
+                                                    .deleteChats(
+                                                  sender: FirebaseAuthService
+                                                          .auth
+                                                          .checkUserStatus!
+                                                          .email ??
+                                                      "",
+                                                  receiver: user.email ?? '',
+                                                  id: allChats[index].id,
+                                                );
+                                                Get.back();
+                                              },
+                                              icon: Icon(Icons.delete),
+                                            ),
+                                            IconButton(
+                                              onPressed: () {
+                                                editMsgController.text =
+                                                    allChatData[index].msg;
+                                                Get.back();
+
+                                                Get.bottomSheet(
+                                                  Container(
+                                                    height: 100.h,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius:
+                                                          BorderRadius.only(
+                                                        topLeft:
+                                                            Radius.circular(10),
+                                                        topRight:
+                                                            Radius.circular(10),
+                                                      ),
+                                                    ),
+                                                    child: TextField(
+                                                      controller:
+                                                          editMsgController,
+                                                      decoration:
+                                                          InputDecoration(
+                                                        suffixIcon: IconButton(
+                                                          onPressed: () {
+                                                            String msg =
+                                                                editMsgController
+                                                                    .text;
+                                                            if (msg
+                                                                .isNotEmpty) {
+                                                              FirestoreService.fireStoreService.editChats(
+                                                                  sender: FirebaseAuthService
+                                                                          .auth
+                                                                          .checkUserStatus!
+                                                                          .email ??
+                                                                      '',
+                                                                  receiver: user
+                                                                      .email!,
+                                                                  id: allChats[
+                                                                          index]
+                                                                      .id,
+                                                                  msg: msg);
+                                                            }
+                                                            Get.back();
+                                                          },
+                                                          icon: Icon(
+                                                              Icons.restore),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              icon: Icon(Icons.edit),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.amber,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      padding: EdgeInsets.all(8),
+                                      margin: EdgeInsets.all(4),
+                                      child: Text("${allChatData[index].msg}"),
                                     ),
-                                    padding: EdgeInsets.all(8),
-                                    margin: EdgeInsets.all(4),
-                                    child: Text("${allChatData[index].msg}"),
                                   ),
+                                  Text("${time.hour % 12}:${time.minute}"),
                                 ],
                               )
                             : Row(
@@ -108,7 +196,7 @@ class _ChatPageState extends State<ChatPage> {
                                 children: [
                                   Container(
                                     decoration: BoxDecoration(
-                                      color: Colors.amber,
+                                      color: Colors.blue,
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     padding: EdgeInsets.all(8),
@@ -124,40 +212,16 @@ class _ChatPageState extends State<ChatPage> {
                 },
               ),
             ),
-            Spacer(),
-            Stack(
-              alignment: Alignment.centerRight,
-              children: [
-                Container(
-                  height: 50.h,
-                  alignment: Alignment.center,
-                  child: TextField(
-                    controller: msgController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(28),
-                      ),
-                      hintText: "Write Something...",
-                      hintStyle: TextStyle(color: Colors.grey),
-                    ),
-                    onSubmitted: (value) {
-                      if (value.isNotEmpty) {
-                        FirestoreService.fireStoreService.sentChat(
-                          modal: ChatModal(
-                            msg: value,
-                            sender: FirebaseAuthService
-                                    .auth.checkUserStatus!.email ??
-                                '',
-                            receiver: user.email!,
-                            time: Timestamp.now(),
-                          ),
-                        );
-                      }
-                      msgController.clear();
-                    },
-                  ),
+            // Spacer(),
+            TextField(
+              controller: msgController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(28),
                 ),
-                IconButton(
+                hintText: "Write Something...",
+                hintStyle: TextStyle(color: Colors.grey),
+                suffixIcon: IconButton(
                   onPressed: () {
                     String msg = msgController.text;
 
@@ -179,7 +243,21 @@ class _ChatPageState extends State<ChatPage> {
                     Icons.send,
                   ),
                 ),
-              ],
+              ),
+              onSubmitted: (value) {
+                if (value.isNotEmpty) {
+                  FirestoreService.fireStoreService.sentChat(
+                    modal: ChatModal(
+                      msg: value,
+                      sender:
+                          FirebaseAuthService.auth.checkUserStatus!.email ?? '',
+                      receiver: user.email!,
+                      time: Timestamp.now(),
+                    ),
+                  );
+                }
+                msgController.clear();
+              },
             ),
           ],
         ),

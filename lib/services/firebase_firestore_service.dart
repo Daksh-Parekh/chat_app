@@ -69,4 +69,36 @@ class FirestoreService {
         .orderBy('time', descending: false)
         .snapshots();
   }
+
+  //delete chats
+  Future<void> deleteChats(
+      {required String sender, required String receiver, required String id}) {
+    String docId = getDocId(
+      senderMail: sender,
+      receiverMail: receiver,
+    );
+
+    return firestore
+        .collection(chatRoomCollectionName)
+        .doc(docId)
+        .collection('Chats')
+        .doc(id)
+        .delete();
+  }
+
+  //Edit chats
+  Future<void> editChats(
+      {required String sender,
+      required String receiver,
+      required String id,
+      required String msg}) {
+    String docId = getDocId(senderMail: sender, receiverMail: receiver);
+
+    return firestore
+        .collection(chatRoomCollectionName)
+        .doc(docId)
+        .collection('Chats')
+        .doc(id)
+        .update({'msg': msg});
+  }
 }
