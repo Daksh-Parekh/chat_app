@@ -71,12 +71,18 @@ class _ChatPageState extends State<ChatPage> {
                   itemBuilder: (context) {
                     return [
                       PopupMenuItem(
-                        child: Text("Background image"),
+                        child: Text("Periodic Notification"),
                         onTap: () {
                           Get.defaultDialog(
                             actions: [
                               IconButton(
                                 onPressed: () {
+                                  NotificationService.localNortification
+                                      .periodicNotification(
+                                          title: 'Periodically',
+                                          body:
+                                              'Thsi is periodic notification');
+
                                   Get.back();
                                 },
                                 icon: Icon(Icons.save),
@@ -322,7 +328,7 @@ class _ChatPageState extends State<ChatPage> {
                 hintText: "Write Something...",
                 hintStyle: TextStyle(color: Colors.grey),
                 suffixIcon: IconButton(
-                  onPressed: () {
+                  onPressed: () async {
                     String msg = msgController.text;
 
                     if (msg.isNotEmpty) {
@@ -336,18 +342,28 @@ class _ChatPageState extends State<ChatPage> {
                           time: Timestamp.now(),
                         ),
                       );
-                      NotificationService.localNortification
+
+                      await NotificationService.localNortification
                           .showSimpleNotification(
                               id: user.name ?? '', body: msg);
+
+                      msgController.clear();
+                      await NotificationService.localNortification
+                          .scheduledNotification(
+                        title: user.name ?? '',
+                        body: msg,
+                        scheduledDate: DateTime.now().add(
+                          Duration(seconds: 2),
+                        ),
+                      );
                     }
-                    msgController.clear();
                   },
                   icon: Icon(
                     Icons.send,
                   ),
                 ),
               ),
-              onSubmitted: (value) {
+              onSubmitted: (value) async {
                 if (value.isNotEmpty) {
                   FirestoreService.fireStoreService.sentChat(
                     modal: ChatModal(
@@ -356,6 +372,18 @@ class _ChatPageState extends State<ChatPage> {
                           FirebaseAuthService.auth.checkUserStatus!.email ?? '',
                       receiver: user.email!,
                       time: Timestamp.now(),
+                    ),
+                  );
+
+                  await NotificationService.localNortification
+                      .showSimpleNotification(id: user.name ?? '', body: value);
+
+                  await NotificationService.localNortification
+                      .scheduledNotification(
+                    title: user.name ?? '',
+                    body: "This is scheduled notification",
+                    scheduledDate: DateTime.now().add(
+                      Duration(seconds: 2),
                     ),
                   );
                 }
