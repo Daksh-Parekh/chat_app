@@ -5,6 +5,7 @@ import 'package:chat_app/modal/chat_modal.dart';
 import 'package:chat_app/modal/user_modal.dart';
 import 'package:chat_app/services/firebase_auth_service.dart';
 import 'package:chat_app/services/firebase_firestore_service.dart';
+import 'package:chat_app/services/local_notification.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -151,7 +152,7 @@ class _ChatPageState extends State<ChatPage> {
                       itemCount: allChatData.length,
                       itemBuilder: (context, index) {
                         DateTime time = allChatData[index].time.toDate();
-                        log("${allChatData[index].time.toDate().day}/${allChatData[index].time.toDate().month}");
+                        // log("${allChatData[index].time.toDate().day}/${allChatData[index].time.toDate().month}");
                         return Column(
                           children: [
                             (time.day == DateTime.now().day &&
@@ -335,6 +336,9 @@ class _ChatPageState extends State<ChatPage> {
                           time: Timestamp.now(),
                         ),
                       );
+                      NotificationService.localNortification
+                          .showSimpleNotification(
+                              id: user.name ?? '', body: msg);
                     }
                     msgController.clear();
                   },
