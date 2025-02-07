@@ -343,19 +343,25 @@ class _ChatPageState extends State<ChatPage> {
                         ),
                       );
 
-                      await NotificationService.localNortification
-                          .showSimpleNotification(
-                              id: user.name ?? '', body: msg);
+                      // await NotificationService.localNortification
+                      //     .showSimpleNotification(
+                      //         id: user.name ?? '', body: msg);
 
-                      msgController.clear();
+                      // msgController.clear();
+                      // await NotificationService.localNortification
+                      //     .scheduledNotification(
+                      //   title: user.name ?? '',
+                      //   body: msg,
+                      //   scheduledDate: DateTime.now().add(
+                      //     Duration(seconds: 2),
+                      //   ),
+                      // );
+
                       await NotificationService.localNortification
-                          .scheduledNotification(
-                        title: user.name ?? '',
-                        body: msg,
-                        scheduledDate: DateTime.now().add(
-                          Duration(seconds: 2),
-                        ),
-                      );
+                          .bigPictureNotification(
+                              title: user.name ?? '',
+                              body: msg,
+                              url: user.image!);
                     }
                   },
                   icon: Icon(
@@ -386,6 +392,12 @@ class _ChatPageState extends State<ChatPage> {
                       Duration(seconds: 2),
                     ),
                   );
+
+                  await NotificationService.localNortification
+                      .bigPictureNotification(
+                          title: user.name ?? '',
+                          body: value,
+                          url: user.image!);
                 }
                 msgController.clear();
               },

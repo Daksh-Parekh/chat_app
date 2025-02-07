@@ -1,8 +1,11 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/timezone.dart' as tz;
+import 'package:http/http.dart' as http;
 
 class NotificationService {
   NotificationService._();
@@ -102,5 +105,33 @@ class NotificationService {
       details,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
+  }
+
+  Future<void> bigPictureNotification(
+      {required String title,
+      required String body,
+      required String url}) async {
+    http.Response res = await http.get(Uri.parse(url));
+
+    Directory dirPath = await getApplicationCacheDirectory();
+
+    File file = File("${dirPath.path}/img.png");
+
+    file.writeAsBytesSync(res.bodyBytes);
+
+    AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+      '01',
+      'chat_app',
+      priority: Priority.high,
+      importance: Importance.max,
+      largeIcon: FilePathAndroidBitmap(file.path),
+      styleInformation:
+          BigPictureStyleInformation(FilePathAndroidBitmap(file.path)),
+      sound: RawResourceAndroidNotificationSound('sound2'),
+    );
+
+    NotificationDetails details = NotificationDetails(android: androidDetails);
+
+    await plugins.show(101, title, body, details);
   }
 }
