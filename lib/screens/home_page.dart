@@ -57,9 +57,25 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       appBar: AppBar(
+        toolbarHeight: 100,
+        backgroundColor: Colors.blue,
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(01),
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                width: 1.5,
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ),
         title: Text(
           "Chat",
-          style: TextStyle(fontSize: 26.sp, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontSize: 26.sp,
+              fontWeight: FontWeight.bold,
+              color: Colors.white),
         ),
       ),
       body: Padding(
