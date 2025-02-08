@@ -1,8 +1,10 @@
 import 'dart:developer';
+import 'dart:math';
 
 import 'package:chat_app/controller/home_controller.dart';
 import 'package:chat_app/modal/chat_modal.dart';
 import 'package:chat_app/modal/user_modal.dart';
+import 'package:chat_app/services/fcm_service.dart';
 import 'package:chat_app/services/firebase_auth_service.dart';
 import 'package:chat_app/services/firebase_firestore_service.dart';
 import 'package:chat_app/services/local_notification.dart';
@@ -32,7 +34,7 @@ class _ChatPageState extends State<ChatPage> {
         child: Column(
           children: [
             SizedBox(
-              height: 14.h,
+              height: 12.h,
             ),
             Row(
               children: [
@@ -40,16 +42,13 @@ class _ChatPageState extends State<ChatPage> {
                   onPressed: () {
                     Get.back();
                   },
-                  icon: Icon(
-                    Icons.arrow_back,
-                    size: 32.w,
-                  ),
+                  icon: Icon(Icons.arrow_back, size: 26.sp),
                 ),
                 CircleAvatar(
-                  radius: 34.w,
+                  radius: 20.sp,
                   foregroundImage: NetworkImage(user.image!),
                 ),
-                Spacer(),
+                SizedBox(width: 10.w),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -60,80 +59,20 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                     Text(
                       "${user.email}",
-                      style: TextStyle(fontSize: 12.sp),
+                      style: TextStyle(fontSize: 10.sp),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
                 Spacer(),
-                PopupMenuButton(
-                  itemBuilder: (context) {
-                    return [
-                      PopupMenuItem(
-                        child: Text("Periodic Notification"),
-                        onTap: () {
-                          Get.defaultDialog(
-                            actions: [
-                              IconButton(
-                                onPressed: () {
-                                  NotificationService.localNortification
-                                      .periodicNotification(
-                                          title: 'Periodically',
-                                          body:
-                                              'Thsi is periodic notification');
-
-                                  Get.back();
-                                },
-                                icon: Icon(Icons.save),
-                              ),
-                            ],
-                            content: SizedBox(
-                              height: 300,
-                              child: GetBuilder<HomeController>(
-                                  builder: (context) {
-                                return GridView.builder(
-                                  itemCount: controller.chatBgImage.length,
-                                  gridDelegate:
-                                      SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount: 3,
-                                          mainAxisSpacing: 5,
-                                          crossAxisSpacing: 5),
-                                  itemBuilder: (context, index) {
-                                    return GestureDetector(
-                                      onTap: () {
-                                        controller.changeBgInx(index);
-                                      },
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                            image: NetworkImage(
-                                                controller.chatBgImage[index]),
-                                            fit: BoxFit.cover,
-                                          ),
-                                          border: Border.all(
-                                            color: controller.inx == index
-                                                ? Colors.black
-                                                : Colors.transparent,
-                                            width: 4,
-                                          ),
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                );
-                              }),
-                            ),
-                          );
-                        },
-                      ),
-                    ];
-                  },
-                ),
+                Icon(Icons.video_call_rounded),
+                SizedBox(width: 12.w),
+                Icon(Icons.call),
+                SizedBox(width: 6.w),
               ],
             ),
+            Divider(),
             Expanded(
               child: StreamBuilder(
                 stream: FirestoreService.fireStoreService.fetchChats(
@@ -153,7 +92,7 @@ class _ChatPageState extends State<ChatPage> {
                         )
                         .toList();
 
-                    log("${allChatData}");
+                    // log("${allChatData}");
                     return ListView.builder(
                       itemCount: allChatData.length,
                       itemBuilder: (context, index) {
@@ -184,128 +123,229 @@ class _ChatPageState extends State<ChatPage> {
                                 ? Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
-                                      GestureDetector(
-                                        onLongPress: () {
-                                          Get.defaultDialog(
-                                            content: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceAround,
-                                              children: [
-                                                IconButton(
-                                                  onPressed: () {
-                                                    FirestoreService
-                                                        .fireStoreService
-                                                        .deleteChats(
-                                                      sender: FirebaseAuthService
-                                                              .auth
-                                                              .checkUserStatus!
-                                                              .email ??
-                                                          "",
-                                                      receiver:
-                                                          user.email ?? '',
-                                                      id: allChats[index].id,
-                                                    );
-                                                    Get.back();
-                                                  },
-                                                  icon: Icon(Icons.delete),
-                                                ),
-                                                Visibility(
-                                                  visible: (DateTime.now()
-                                                          .difference(time)
-                                                          .inMinutes <=
-                                                      10),
-                                                  child: IconButton(
+                                      Flexible(
+                                        child: GestureDetector(
+                                          onLongPress: () {
+                                            Get.defaultDialog(
+                                              content: Row(
+                                                mainAxisAlignment: (DateTime
+                                                                .now()
+                                                            .difference(time)
+                                                            .inMinutes <=
+                                                        10)
+                                                    ? MainAxisAlignment
+                                                        .spaceAround
+                                                    : MainAxisAlignment.center,
+                                                children: [
+                                                  ElevatedButton.icon(
                                                     onPressed: () {
-                                                      editMsgController.text =
-                                                          allChatData[index]
-                                                              .msg;
+                                                      FirestoreService
+                                                          .fireStoreService
+                                                          .deleteChats(
+                                                        sender: FirebaseAuthService
+                                                                .auth
+                                                                .checkUserStatus!
+                                                                .email ??
+                                                            "",
+                                                        receiver:
+                                                            user.email ?? '',
+                                                        id: allChats[index].id,
+                                                      );
                                                       Get.back();
+                                                    },
+                                                    label: Text("Delete"),
+                                                    icon: Icon(Icons.delete),
+                                                  ),
+                                                  Visibility(
+                                                    visible: (DateTime.now()
+                                                            .difference(time)
+                                                            .inMinutes <=
+                                                        10),
+                                                    child: ElevatedButton.icon(
+                                                      label: Text("Edit"),
+                                                      onPressed: () {
+                                                        editMsgController.text =
+                                                            allChatData[index]
+                                                                .msg;
+                                                        Get.back();
 
-                                                      Get.bottomSheet(
-                                                        Container(
-                                                          height: 100.h,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color: Colors.white,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .only(
-                                                              topLeft: Radius
-                                                                  .circular(10),
-                                                              topRight: Radius
-                                                                  .circular(10),
-                                                            ),
-                                                          ),
-                                                          child: TextField(
-                                                            controller:
-                                                                editMsgController,
+                                                        Get.bottomSheet(
+                                                          Container(
+                                                            height: 100.h,
+                                                            alignment: Alignment
+                                                                .center,
+                                                            padding:
+                                                                EdgeInsets.all(
+                                                                    16),
                                                             decoration:
-                                                                InputDecoration(
-                                                              suffixIcon:
-                                                                  IconButton(
-                                                                onPressed: () {
-                                                                  String msg =
-                                                                      editMsgController
-                                                                          .text;
-                                                                  if (msg
-                                                                      .isNotEmpty) {
-                                                                    FirestoreService.fireStoreService.editChats(
-                                                                        sender:
-                                                                            FirebaseAuthService.auth.checkUserStatus!.email ??
-                                                                                '',
-                                                                        receiver:
-                                                                            user
-                                                                                .email!,
-                                                                        id: allChats[index]
-                                                                            .id,
-                                                                        msg:
-                                                                            msg);
-                                                                  }
-                                                                  Get.back();
-                                                                },
-                                                                icon: Icon(Icons
-                                                                    .restore),
+                                                                BoxDecoration(
+                                                              color:
+                                                                  Colors.white,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .only(
+                                                                topLeft: Radius
+                                                                    .circular(
+                                                                        10),
+                                                                topRight: Radius
+                                                                    .circular(
+                                                                        10),
+                                                              ),
+                                                            ),
+                                                            child: TextField(
+                                                              controller:
+                                                                  editMsgController,
+                                                              decoration:
+                                                                  InputDecoration(
+                                                                fillColor: Colors
+                                                                    .lightBlueAccent
+                                                                    .withOpacity(
+                                                                        0.4),
+                                                                filled: true,
+                                                                border:
+                                                                    OutlineInputBorder(
+                                                                  borderSide:
+                                                                      BorderSide(
+                                                                          color:
+                                                                              Colors.blue),
+                                                                ),
+                                                                suffixIcon:
+                                                                    IconButton(
+                                                                  onPressed:
+                                                                      () {
+                                                                    String msg =
+                                                                        editMsgController
+                                                                            .text;
+                                                                    if (msg
+                                                                        .isNotEmpty) {
+                                                                      FirestoreService.fireStoreService.editChats(
+                                                                          sender: FirebaseAuthService.auth.checkUserStatus!.email ??
+                                                                              '',
+                                                                          receiver: user
+                                                                              .email!,
+                                                                          id: allChats[index]
+                                                                              .id,
+                                                                          msg:
+                                                                              msg);
+                                                                    }
+                                                                    Get.back();
+                                                                  },
+                                                                  icon: Icon(
+                                                                      Icons
+                                                                          .send),
+                                                                ),
                                                               ),
                                                             ),
                                                           ),
-                                                        ),
-                                                      );
-                                                    },
-                                                    icon: Icon(Icons.edit),
+                                                        );
+                                                      },
+                                                      icon: Icon(Icons.edit),
+                                                    ),
                                                   ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                          child: IntrinsicWidth(
+                                            child: Container(
+                                              constraints: BoxConstraints(
+                                                maxWidth: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.6,
+                                                minWidth: 0.0,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: const Color.fromARGB(
+                                                    255, 160, 219, 246),
+                                                border: Border.all(
+                                                    color: Colors.lightBlue),
+                                                borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(22),
+                                                  topRight: Radius.circular(24),
+                                                  bottomLeft:
+                                                      Radius.circular(22),
                                                 ),
-                                              ],
+                                              ),
+                                              padding: EdgeInsets.all(8),
+                                              margin: EdgeInsets.all(4),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.end,
+                                                children: [
+                                                  Text(
+                                                    "${allChatData[index].msg}",
+                                                    style: TextStyle(
+                                                      fontSize: 15.sp,
+                                                    ),
+                                                  ),
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.bottomRight,
+                                                    child: Text(
+                                                      "${time.hour % 12}:${time.minute.toString().padLeft(2, '0')} ${time.hour >= 12 ? 'PM' : 'AM'}",
+                                                      style: TextStyle(
+                                                        fontSize: 12.sp,
+                                                        color: Colors.black54,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                          );
-                                        },
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            color: Colors.amber,
-                                            borderRadius:
-                                                BorderRadius.circular(10),
                                           ),
-                                          padding: EdgeInsets.all(8),
-                                          margin: EdgeInsets.all(4),
-                                          child:
-                                              Text("${allChatData[index].msg}"),
                                         ),
                                       ),
-                                      Text("${time.hour % 12}:${time.minute}"),
+                                      // Text("${time.hour % 12}:${time.minute}"),
                                     ],
                                   )
                                 : Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.blue,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
+                                      IntrinsicWidth(
+                                        child: Container(
+                                          constraints: BoxConstraints(
+                                              maxWidth: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.7),
+                                          decoration: BoxDecoration(
+                                            color: const Color.fromARGB(
+                                                255, 147, 233, 150),
+                                            border:
+                                                Border.all(color: Colors.green),
+                                            borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(30),
+                                              topRight: Radius.circular(30),
+                                              bottomRight: Radius.circular(30),
+                                            ),
+                                          ),
+                                          padding: EdgeInsets.all(8),
+                                          margin: EdgeInsets.all(4),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
+                                            children: [
+                                              Text(
+                                                "${allChatData[index].msg}",
+                                                style: TextStyle(
+                                                  fontSize: 15.sp,
+                                                ),
+                                              ),
+                                              Align(
+                                                alignment:
+                                                    Alignment.bottomRight,
+                                                child: Text(
+                                                  "${time.hour % 12}:${time.minute.toString().padLeft(2, '0')} ${time.hour >= 12 ? 'PM' : 'AM'}",
+                                                  style: TextStyle(
+                                                    fontSize: 12.sp,
+                                                    color: Colors.black54,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                        padding: EdgeInsets.all(8),
-                                        margin: EdgeInsets.all(4),
-                                        child:
-                                            Text("${allChatData[index].msg}"),
                                       ),
                                     ],
                                   ),
@@ -342,12 +382,17 @@ class _ChatPageState extends State<ChatPage> {
                           time: Timestamp.now(),
                         ),
                       );
+                      FCMService.fcmService.sendFCM(
+                          title: user.name ?? '',
+                          body: msg,
+                          token: user.token!);
 
                       // await NotificationService.localNortification
                       //     .showSimpleNotification(
                       //         id: user.name ?? '', body: msg);
 
-                      // msgController.clear();
+                      msgController.clear();
+
                       // await NotificationService.localNortification
                       //     .scheduledNotification(
                       //   title: user.name ?? '',
@@ -357,11 +402,11 @@ class _ChatPageState extends State<ChatPage> {
                       //   ),
                       // );
 
-                      await NotificationService.localNortification
-                          .bigPictureNotification(
-                              title: user.name ?? '',
-                              body: msg,
-                              url: user.image!);
+                      // await NotificationService.localNortification
+                      //     .bigPictureNotification(
+                      //         title: user.name ?? '',
+                      //         body: msg,
+                      //         url: user.image!);
                     }
                   },
                   icon: Icon(
@@ -381,23 +426,26 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   );
 
-                  await NotificationService.localNortification
-                      .showSimpleNotification(id: user.name ?? '', body: value);
+                  FCMService.fcmService.sendFCM(
+                      title: user.name ?? '', body: value, token: user.token!);
 
-                  await NotificationService.localNortification
-                      .scheduledNotification(
-                    title: user.name ?? '',
-                    body: "This is scheduled notification",
-                    scheduledDate: DateTime.now().add(
-                      Duration(seconds: 2),
-                    ),
-                  );
+                  // await NotificationService.localNortification
+                  //     .showSimpleNotification(id: user.name ?? '', body: value);
 
-                  await NotificationService.localNortification
-                      .bigPictureNotification(
-                          title: user.name ?? '',
-                          body: value,
-                          url: user.image!);
+                  // await NotificationService.localNortification
+                  //     .scheduledNotification(
+                  //   title: user.name ?? '',
+                  //   body: "This is scheduled notification",
+                  //   scheduledDate: DateTime.now().add(
+                  //     Duration(seconds: 2),
+                  //   ),
+                  // );
+
+                  // await NotificationService.localNortification
+                  //     .bigPictureNotification(
+                  //         title: user.name ?? '',
+                  //         body: value,
+                  //         url: user.image!);
                 }
                 msgController.clear();
               },

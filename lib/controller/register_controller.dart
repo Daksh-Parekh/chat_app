@@ -5,6 +5,7 @@ import 'package:chat_app/modal/user_modal.dart';
 import 'package:chat_app/services/firebase_auth_service.dart';
 import 'package:chat_app/services/firebase_firestore_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -12,6 +13,16 @@ import 'package:toastification/toastification.dart';
 
 class RegisterController extends GetxController {
   File? image;
+  RxBool isPassword = true.obs;
+  RxBool isConfirmPassword = true.obs;
+
+  void changePasswordVisibilty() {
+    isPassword.value = !isPassword.value;
+  }
+
+  void changeConfirmPasswordVisibilty() {
+    isConfirmPassword.value = !isConfirmPassword.value;
+  }
 
   Future<void> register(
       {required String email,
@@ -28,11 +39,13 @@ class RegisterController extends GetxController {
 
       FirestoreService.fireStoreService.addUser(
         modal: UserModal(
-            uid: FirebaseAuthService.auth.checkUserStatus?.uid ?? '',
-            name: userName,
-            email: email,
-            password: password,
-            image: image),
+          uid: FirebaseAuthService.auth.checkUserStatus?.uid ?? '',
+          name: userName,
+          email: email,
+          password: password,
+          image: image,
+          token: await FirebaseMessaging.instance.getToken(),
+        ),
       );
 
       toastification.show(
@@ -53,11 +66,22 @@ class RegisterController extends GetxController {
     }
   }
 
-  Future<void> pickImage() async {
+  Future<void> pickGalleryImage() async {
     ImagePicker picker = ImagePicker();
     XFile? file = await picker.pickImage(source: ImageSource.gallery);
     if (file != null) {
       image = File(file.path);
+      Get.back();
+    }
+    update();
+  }
+
+  Future<void> pickCameraImage() async {
+    ImagePicker picker = ImagePicker();
+    XFile? file = await picker.pickImage(source: ImageSource.camera);
+    if (file != null) {
+      image = File(file.path);
+      Get.back();
     }
     update();
   }

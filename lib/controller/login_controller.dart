@@ -6,11 +6,18 @@ import 'package:chat_app/services/firebase_auth_service.dart';
 import 'package:chat_app/services/firebase_firestore_service.dart';
 import 'package:chat_app/utils/routes/app_routes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:toastification/toastification.dart';
 
 class LoginController extends GetxController {
+  RxBool isPassword = true.obs;
+
+  void changePasswordVisibilty() {
+    isPassword.value = !isPassword.value;
+  }
+
   //Login user with email&password
   Future<void> loginUser(
       {required String email, required String password}) async {
@@ -72,6 +79,7 @@ class LoginController extends GetxController {
             email: userStatus.email,
             password: "",
             image: userStatus.photoURL,
+            token: await FirebaseMessaging.instance.getToken(),
           ),
         );
       }
