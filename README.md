@@ -54,23 +54,23 @@ A real-time chat application built using Flutter and Firebase. This app allows u
 5. Messages display the time they were sent.
 6. Log out when finished.
 
-
 # Screenshots & Video
   ## Screenshots
 <img src="https://github.com/user-attachments/assets/64ce78e2-5d2e-43e1-97c9-2e1cc99ffe9f" width="300px">|
-<img src="https://github.com/user-attachments/assets/5b4beb83-33b5-4443-bc4a-45cc73c058f9" width="300px">|
-<img src="https://github.com/user-attachments/assets/e170269f-21aa-4c76-aa93-c26a21210eef" width="300px">|
+<img src="https://github.com/user-attachments/assets/f2edeca1-0667-4770-bb62-381083b77d1e" width="300px">|
+<img src="https://github.com/user-attachments/assets/0cca0a82-9f95-415f-b397-627110799dc2" width="300px">|
 
-<img src="https://github.com/user-attachments/assets/fc0cac5e-282e-45d3-ac7d-b27986e8af7f" width="300px">|
-<img src="https://github.com/user-attachments/assets/4ec8e33c-fc79-4ad4-97c4-aace9a63005b" width="300px">|
-<img src="https://github.com/user-attachments/assets/1581a55e-abda-4c55-bf6d-1d73809c797b" width="300px">|
+<img src="https://github.com/user-attachments/assets/f5c4ca4d-cca9-4e7f-bbc7-2d01debe1c69" width="300px">|
+<img src="https://github.com/user-attachments/assets/8ddd7e57-861a-481c-b060-eeee71cdab40" width="300px">|
+<img src="https://github.com/user-attachments/assets/d897f6b6-44c3-4762-a528-b6d95d11d84c" width="300px">|
 
-<img src="https://github.com/user-attachments/assets/cccb480d-20b8-4fa7-a880-cd0c5860a695" width="300px">|
-<img src="https://github.com/user-attachments/assets/3b6eebd7-657b-4546-80a4-1901915c98d5" width="300px">|
+<img src="https://github.com/user-attachments/assets/5c85325b-adcf-48b7-b2ff-4c68be431320" width="300px">|
+<img src="https://github.com/user-attachments/assets/49de9366-ac2e-4aec-8638-dad07880e3d3" width="300px">|
 <img src="https://github.com/user-attachments/assets/e2ff299d-b5cf-40cc-a5a7-a67bf6328767" width="300px">|
 
 ## Video Demo
 
 
-https://github.com/user-attachments/assets/928effc6-4d82-4f13-ab46-3dd56aab2563
+
+https://github.com/user-attachments/assets/4926c3c2-00e2-4cac-a978-84f459a73414
 
